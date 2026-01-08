@@ -1,0 +1,27 @@
+name: Python Backend Lint
+
+on:
+    pull_request:
+        paths:
+            - "backend/fastapi-backend/**"
+
+jobs: 
+    lint: 
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: backend/fastapi-backend
+
+        steps:
+            - uses: actions/checkout@v4
+            
+            - uses: actions/setup-python@v5
+              with:
+                python-version: "3.11.14"
+            
+            - run: pip install black isort ruff
+
+            - run: ruff check .
+            - run: black --check .
+            - run: isort --check-only .
