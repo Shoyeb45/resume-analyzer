@@ -1,18 +1,19 @@
-from typing import List, Any, Dict, Optional, Tuple
+from typing import List, Optional, Tuple
+
 
 class PromptCreator:
     def __init__(self):
         pass
-      
+
     def _create_analysis_prompt(
-            self, 
-            text: str, 
-            target_role: str, 
-            job_description: str, 
-        ) -> str:
-            """Create a precise and structured prompt for resume analysis, ensuring JSON-only output."""
-            
-            system_prompt = """
+        self,
+        text: str,
+        target_role: str,
+        job_description: str,
+    ) -> str:
+        """Create a precise and structured prompt for resume analysis, ensuring JSON-only output."""
+
+        system_prompt = """
 You are a highly experienced Resume Analyst with over 15 years in talent acquisition, career development, and ATS optimization.
 🛠 OBJECTIVE:
 You must analyze a resume against a specific job description and role. Return *only* a strictly valid JSON object summarizing the analysis.
@@ -56,7 +57,7 @@ You must analyze a resume against a specific job description and role. Return *o
 4. ATS-friendliness, keyword richness, formatting quality
 5. Overall presentation, clarity, and professionalism""".strip()
 
-            user_prompt = f"""
+        user_prompt = f"""
         Analyze the following resume for its suitability for the role below and provide your analysis in the defined JSON structure only.
 
         🎯 TARGET ROLE:
@@ -71,8 +72,11 @@ You must analyze a resume against a specific job description and role. Return *o
         Follow the evaluation criteria strictly and return only the JSON object as instructed.
         """.strip()
 
-            return system_prompt, user_prompt 
-    def _create_scoring_prompt(self, text: str, target_role: str, job_description: str) -> str:
+        return system_prompt, user_prompt
+
+    def _create_scoring_prompt(
+        self, text: str, target_role: str, job_description: str
+    ) -> str:
         """Create prompt for resume scoring"""
 
         system_prompt = """You are an expert resume evaluator specializing in ATS scoring and resume assessment.
@@ -107,17 +111,17 @@ RESUME CONTENT:
 Provide your assessment in the specified JSON format."""
 
         return system_prompt, user_prompt
-    
+
     def _create_improvement_prompt(
-        self, 
-        section_text: str, 
-        section_name: str, 
-        target_role: str, 
-        job_description: str
+        self,
+        section_text: str,
+        section_name: str,
+        target_role: str,
+        job_description: str,
     ) -> str:
         """Create prompt for section improvement"""
 
-        system_prompt = f"""You are an expert resume writer specializing in optimizing resume sections for maximum impact.
+        system_prompt = """You are an expert resume writer specializing in optimizing resume sections for maximum impact.
 
 Your task is to improve resume sections to make them:
 - More impactful and results-oriented
@@ -139,12 +143,9 @@ ORIGINAL {section_name.upper()} SECTION:
 Provide an improved version of this section that is more impactful, ATS-friendly, and relevant to the target role."""
 
         return system_prompt, user_prompt
-    
+
     def _create_generation_prompt(
-        self, 
-        sections_summary: str, 
-        target_role: str, 
-        job_description: str
+        self, sections_summary: str, target_role: str, job_description: str
     ) -> str:
         """Create prompt for complete resume generation"""
 
@@ -178,7 +179,9 @@ Generate a complete, well-structured resume based on the provided information.""
 
         return system_prompt, user_prompt
 
-    def _create_career_suggestion_prompt(self, skill_scores: List, overall_score: float) -> str:
+    def _create_career_suggestion_prompt(
+        self, skill_scores: List, overall_score: float
+    ) -> str:
         system_prompt = """You are an expert career mentor with extensive experience in career guidance and skill assessment.
 
 Your task is to provide career suggestions based on skill scores and overall performance. You need to analyze the data and provide:
@@ -226,12 +229,9 @@ OVERALL SCORE: {overall_score}
 Analyze this data and provide role suggestions, strengths, improvement areas, and tips in the specified JSON format."""
 
         return system_prompt, user_prompt
-     
+
     def _create_section_prompt(
-        self, 
-        text: str, 
-        target_role: str, 
-        job_description: str
+        self, text: str, target_role: str, job_description: str
     ) -> str:
         """Create prompt for resume analysis returning only a JSON object"""
         system_prompt = """You are a professional resume evaluation expert specializing in section-by-section analysis.
@@ -301,9 +301,9 @@ RESUME TEXT:
 Provide a detailed section-by-section analysis in the specified JSON format."""
 
         return system_prompt, user_prompt
-    
+
     def _create_skill_assessment_prompt(self, technical_skills: str, soft_skills: str):
-        
+
         system_prompt = """You are an expert assessment generator specializing in creating comprehensive skill evaluations.
 
 Your task is to generate 10 multiple choice questions that test understanding and practical knowledge of both technical and soft skills.
@@ -342,20 +342,20 @@ SOFT SKILLS: {soft_skills}
 Create questions that test both theoretical knowledge and practical application of these skills. Return the assessment in the specified JSON format."""
 
         return system_prompt, user_prompt
-  
+
     def _create_experience_section_prompt(
         self,
-        organisation_name: str, 
-        position: str, 
-        location: str, 
-        description: Optional[List[str]] = None
+        organisation_name: str,
+        position: str,
+        location: str,
+        description: Optional[List[str]] = None,
     ) -> Tuple[str, str]:
         if not description:
             description = ["Description not provided. You must create it from scratch."]
-        
+
         if not description:
             description = ["Description not provided. You must create it from scratch."]
-        
+
         system_prompt = f"""You are a resume writing assistant specializing in creating strong professional experience descriptions.
 
 Your task is to generate {len(description)} impactful bullet points for a work experience entry.
@@ -381,16 +381,18 @@ EXISTING POINTS: {description}
 Create {len(description)} enhanced bullet points that highlight achievements and impact."""
 
         return system_prompt, user_prompt
-     
+
     def _create_extracurricular_section_prompt(
         self,
-        organisation_name: str, 
-        position: str, 
-        location: str, 
-        description: Optional[List[str]] = None
+        organisation_name: str,
+        position: str,
+        location: str,
+        description: Optional[List[str]] = None,
     ) -> str:
         if not description:
-            description = ["Bullet points not provided. You must create it from scratch."]
+            description = [
+                "Bullet points not provided. You must create it from scratch."
+            ]
 
         system_prompt = f"""You are a resume writing assistant specializing in presenting extracurricular activities professionally.
 
@@ -417,17 +419,17 @@ EXISTING BULLET POINTS: {description}
 Create {len(description)} enhanced bullet point(s) that showcase leadership, impact, and skills developed."""
 
         return system_prompt, user_prompt
-   
+
     def _create_project_section_prompt(
         self,
         project_name: str,
         tech_stack: str,
-        bullet_points: Optional[List[str]] = None
+        bullet_points: Optional[List[str]] = None,
     ):
-        
+
         if not bullet_points:
             bullet_points = []
-        
+
         system_prompt = f"""You are a technical resume writer specializing in project portfolio presentation.
 
 Your task is to create {len(bullet_points)} enhanced technical bullet points that demonstrate:
@@ -457,9 +459,9 @@ CURRENT POINTS: {str(bullet_points)}
 Generate exactly {len(bullet_points)} enhanced technical bullet points that showcase technical expertise and project impact."""
 
         return system_prompt, user_prompt
-    
+
     def _create_resume_parser_prompt(self, text: str):
-        
+
         system_prompt = """You are an expert resume parser specializing in extracting structured data from resumes.
 
     Your task is to extract resume information and format it as a JSON object with the following structure:
@@ -609,7 +611,7 @@ Generate exactly {len(bullet_points)} enhanced technical bullet points that show
     Parse this resume and return the structured data in the specified JSON format. Remember: use empty arrays [] for missing list data, not objects with null values."""
 
         return system_prompt, user_prompt
-    
+
     def _create_ats_prompt(self, resume_data: dict) -> str:
         system_prompt = """You are an advanced Applicant Tracking System (ATS) evaluator specializing in resume assessment.
 
@@ -649,21 +651,23 @@ Assume the resume is written in clean and ATS-compatible LaTeX format."""
         personal_info = resume_data.get("personal_info", {})
         name = personal_info.get("name", "N/A")
         summary = personal_info.get("professional_summary", "N/A")
-        
+
         # Skills
         skills_flat = []
         for group in resume_data.get("skills", []):
             skills_flat.extend(group.get("skills", []))
-        
+
         # Projects
         project_details = []
         for proj in resume_data.get("projects", []):
             title = proj.get("title", "")
             bullets = proj.get("bullet_points", [])
             tech = proj.get("technologies_used", [])
-            project_details.append(f"Title: {title}\nTech: {', '.join(tech)}\nHighlights:\n" +
-                                "\n".join([f"  - {b}" for b in bullets]))
-        
+            project_details.append(
+                f"Title: {title}\nTech: {', '.join(tech)}\nHighlights:\n"
+                + "\n".join([f"  - {b}" for b in bullets])
+            )
+
         # Education
         education_details = []
         for edu in resume_data.get("educations", []):
@@ -673,17 +677,26 @@ Assume the resume is written in clean and ATS-compatible LaTeX format."""
         # Achievements
         achievement_details = []
         for ach in resume_data.get("achievements", []):
-            achievement_details.append(f"{ach.get('title', '')}: {ach.get('description', '')}")
+            achievement_details.append(
+                f"{ach.get('title', '')}: {ach.get('description', '')}"
+            )
 
         # Extracurriculars
         extracurricular_details = []
         for extra in resume_data.get("extracurriculars", []):
-            bullet_str = "\n".join([f"  - {bp}" for bp in extra.get("bullet_points", [])])
-            extracurricular_details.append(f"{extra.get('title', '')} ({extra.get('role', '')}):\n{bullet_str}")
+            bullet_str = "\n".join(
+                [f"  - {bp}" for bp in extra.get("bullet_points", [])]
+            )
+            extracurricular_details.append(
+                f"{extra.get('title', '')} ({extra.get('role', '')}):\n{bullet_str}"
+            )
 
         # Languages
-        languages = [lang.get("language", "") + f" ({lang.get('proficiency', '')})"
-                    for lang in resume_data.get("languages", []) if lang.get("language")]
+        languages = [
+            lang.get("language", "") + f" ({lang.get('proficiency', '')})"
+            for lang in resume_data.get("languages", [])
+            if lang.get("language")
+        ]
 
         # Contact Links
         contact_info = personal_info.get("contact_info", {})

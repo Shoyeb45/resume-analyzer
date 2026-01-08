@@ -1,20 +1,24 @@
-from groq import Groq
-from features.resume.config import ResumeAnalyzerConfig
+import json
 import logging
-from typing import Optional, Dict
-import re, json
+import re
+from typing import Dict, Optional
+
+from groq import Groq
+
+from features.resume.config import ResumeAnalyzerConfig
 
 logger = logging.getLogger(__name__)
 
+
 class ResumeDetailsExtractor:
-    def __init__(self, logger:logging.Logger):
+    def __init__(self, logger: logging.Logger):
         self.groq_client = self._initialize_groq_client()
-        self.model = ResumeAnalyzerConfig.MODEL 
-        
+        self.model = ResumeAnalyzerConfig.MODEL
+
     def _initialize_groq_client(self) -> Optional[Groq]:
         """
         Initialize Groq client for AI analysis
-        
+
         Returns:
             Optional[Groq]: Groq client instance or None if initialization fails
         """
@@ -30,44 +34,44 @@ class ResumeDetailsExtractor:
     def extract_json_from_response(response_text):
         """
         Extract JSON string from LLM response that may contain extra text.
-        
+
         Args:
             response_text (str): The raw response from the LLM
-            
+
         Returns:
             str: Clean JSON string, or None if no valid JSON found
         """
-        
+
         logger.info("Extracting json from llm response of resume text")
         if not response_text:
             return None
-        
+
         # Remove common markdown formatting
         text = response_text.strip()
-        text = re.sub(r'^```json\s*', '', text, flags=re.MULTILINE)
-        text = re.sub(r'^```\s*$', '', text, flags=re.MULTILINE)
+        text = re.sub(r"^```json\s*", "", text, flags=re.MULTILINE)
+        text = re.sub(r"^```\s*$", "", text, flags=re.MULTILINE)
         text = text.strip()
-        
+
         # Method 1: Try to find JSON between first { and last }
-        first_brace = text.find('{')
-        last_brace = text.rfind('}')
-        
+        first_brace = text.find("{")
+        last_brace = text.rfind("}")
+
         if first_brace != -1 and last_brace != -1 and first_brace < last_brace:
-            potential_json = text[first_brace:last_brace + 1]
-            
+            potential_json = text[first_brace : last_brace + 1]
+
             # Validate if it's proper JSON
             try:
                 json.loads(potential_json)
                 return potential_json
             except json.JSONDecodeError:
                 pass
-        
+
         # Method 2: Use regex to find JSON-like structures
         json_patterns = [
-            r'\{.*\}',  # Basic { to } matching
-            r'\{[\s\S]*\}',  # Multi-line { to } matching
+            r"\{.*\}",  # Basic { to } matching
+            r"\{[\s\S]*\}",  # Multi-line { to } matching
         ]
-        
+
         for pattern in json_patterns:
             matches = re.findall(pattern, text, re.DOTALL)
             for match in matches:
@@ -76,69 +80,86 @@ class ResumeDetailsExtractor:
                     return match
                 except json.JSONDecodeError:
                     continue
-        
+
         # Method 3: Try to clean common prefixes/suffixes
         cleaning_patterns = [
-            (r'^.*?(\{.*\}).*?$', r'\1'),  # Extract content between first { and last }
-            (r'^[^{]*(\{.*\})[^}]*$', r'\1'),  # Remove text before first { and after last }
-            (r'Here\'s the JSON:?\s*(\{.*\})', r'\1'),  # Remove "Here's the JSON:" prefix
-            (r'```json\s*(\{.*\})\s*```', r'\1'),  # Remove markdown code blocks
-            (r'^.*?JSON.*?:?\s*(\{.*\})', r'\1'),  # Remove any JSON-related prefix
+            (r"^.*?(\{.*\}).*?$", r"\1"),  # Extract content between first { and last }
+            (
+                r"^[^{]*(\{.*\})[^}]*$",
+                r"\1",
+            ),  # Remove text before first { and after last }
+            (
+                r"Here\'s the JSON:?\s*(\{.*\})",
+                r"\1",
+            ),  # Remove "Here's the JSON:" prefix
+            (r"```json\s*(\{.*\})\s*```", r"\1"),  # Remove markdown code blocks
+            (r"^.*?JSON.*?:?\s*(\{.*\})", r"\1"),  # Remove any JSON-related prefix
         ]
-        
+
         for pattern, replacement in cleaning_patterns:
-            cleaned = re.sub(pattern, replacement, text, flags=re.DOTALL | re.IGNORECASE)
+            cleaned = re.sub(
+                pattern, replacement, text, flags=re.DOTALL | re.IGNORECASE
+            )
             try:
                 json.loads(cleaned)
                 return cleaned
             except json.JSONDecodeError:
                 continue
-        
+
         # Method 4: Manual brace matching for nested JSON
         brace_count = 0
         start_idx = -1
-        
+
         for i, char in enumerate(text):
-            if char == '{':
+            if char == "{":
                 if brace_count == 0:
                     start_idx = i
                 brace_count += 1
-            elif char == '}':
+            elif char == "}":
                 brace_count -= 1
                 if brace_count == 0 and start_idx != -1:
-                    potential_json = text[start_idx:i + 1]
+                    potential_json = text[start_idx : i + 1]
                     try:
                         json.loads(potential_json)
                         return potential_json
                     except json.JSONDecodeError:
                         continue
-        
+
         return None
 
     @staticmethod
     def parse_resume_with_json_extraction(response_text: str):
         """
         Parse resume response and extract clean JSON.
-        
+
         Args:
             groq_response: The response object from Groq API
-            
+
         Returns:
             dict: Parsed JSON data, or None if extraction failed
         """
         try:
-            
+
             # Extract JSON string
-            json_string = ResumeDetailsExtractor.extract_json_from_response(response_text)
-            
+            json_string = ResumeDetailsExtractor.extract_json_from_response(
+                response_text
+            )
+
             if json_string:
                 # Parse and return as dictionary
                 return json.loads(json_string)
             else:
                 logger.warning("Could not extract valid JSON from response")
-                logger.warning("Raw response: %s", response_text[:200] + "..." if len(response_text) > 200 else response_text)
+                logger.warning(
+                    "Raw response: %s",
+                    (
+                        response_text[:200] + "..."
+                        if len(response_text) > 200
+                        else response_text
+                    ),
+                )
                 return response_text
-                
+
         except Exception as e:
             logger.error(f"Error parsing resume response: {str(e)}")
             return None
@@ -285,25 +306,26 @@ RESUME TEXT:
 
         return prompt
 
-
     def get_resume_details(self, text: str) -> Optional[Dict[str, any]]:
-        '''Method to extract the details of the resume in structured manner from reume
-        
+        """Method to extract the details of the resume in structured manner from reume
+
         Args:
             text: Extracted resume text
-        
+
         Returns:
-            dict: Python object with resume details 
-        '''
+            dict: Python object with resume details
+        """
         try:
-            logger.info("Sent the text to groq for getting structured output of the resume")
-            
+            logger.info(
+                "Sent the text to groq for getting structured output of the resume"
+            )
+
             prompt = self.create_resume_parser_prompt(text)
             response = self.groq_client.chat.completions.create(
                 model="llama3-8b-8192",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=4000,
-                temperature=0.7
+                temperature=0.7,
             )
             analysis = response.choices[0].message.content.strip()
             # extracted_json = self.extract_json_from_response(analysis)
@@ -311,4 +333,3 @@ RESUME TEXT:
         except Exception as e:
             logger.error(f"Error getting resume details from llm: {str(e)}")
             return None
-        
