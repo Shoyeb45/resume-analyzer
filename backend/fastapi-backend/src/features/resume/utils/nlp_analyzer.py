@@ -54,7 +54,8 @@ class NLPAnalyzer:
             target_role (str): Target job role for matching
 
         Returns:
-            Dict[str, Any]: Analysis results including entities, keywords, and role matching
+            Dict[str, Any]: Analysis results including entities, keywords,
+                            and role matching
         """
         try:
             if not self.nlp_model:

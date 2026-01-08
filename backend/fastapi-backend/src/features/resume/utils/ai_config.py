@@ -28,10 +28,7 @@ class AIConfig:
             chat_prompt = [
                 {
                     "role": "system",
-                    "content": [
-                        # {"type": "text", "text": "You are an AI assistant that helps people find information."}
-                        {"type": "text", "text": system_prompt}
-                    ],
+                    "content": [{"type": "text", "text": system_prompt}],
                 },
                 {"role": "user", "content": [{"type": "text", "text": user_prompt}]},
                 {

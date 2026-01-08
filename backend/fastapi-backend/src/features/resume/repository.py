@@ -15,8 +15,6 @@ from fastapi import HTTPException, status
 from pydantic import ValidationError
 from pymongo import DESCENDING
 
-logger = logging.getLogger(__name__)
-
 from .models import (
     ATSScore,
     LLMAnalysis,
@@ -28,6 +26,8 @@ from .models import (
     SectionWiseAnalysis,
     create_resume_model,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class ResumeRepository:
@@ -66,7 +66,8 @@ class ResumeRepository:
 
         except Exception as e:
             logger.error(
-                f"Failed to create resume analysis and resume details in database for user: {user_id}, error: {e}"
+                f"Failed to create resume analysis and resume details in\
+                      database for user: {user_id}, error: {e}"
             )
             raise e
 
@@ -84,11 +85,9 @@ class ResumeRepository:
             Created Resume document
 
         Raises:
-            ValueError: If user already has a primary resume when creating another primary
+            ValueError: If user already has a primary resume when creating
+            another primary
         """
-        # Handle primary resume logic
-        # if resume_details.get('is_primary', False):
-        #     await ResumeRepository._ensure_single_primary_resume(resume_details['user_id'])
 
         # Set timestamps
         now = datetime.utcnow()
@@ -433,7 +432,8 @@ class ResumeRepository:
             # Check if the current user is the owner of the resume
             if str(resume.user_id) != user_id:
                 logger.warning(
-                    f"Unauthorized access: attempt to get resume by user_id: {user_id} for resume owned by {resume.user_id}"
+                    f"Unauthorized access: attempt to get resume by user_id: {user_id} \
+                        for resume owned by {resume.user_id}"
                 )
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -488,9 +488,7 @@ class ResumeRepository:
     @staticmethod
     async def get_primary_resume(user_id: PydanticObjectId) -> Optional[Resume]:
         """Get user's primary resume"""
-        return await Resume.find_one(
-            And(Resume.user_id == user_id, Resume.is_primary == True)
-        )
+        return await Resume.find_one(And(Resume.user_id == user_id, Resume.is_primary))
 
     @staticmethod
     async def search_resumes(
@@ -691,49 +689,16 @@ class ResumeRepository:
             raise http_excep
         except Exception as e:
             logger.error(
-                f"Failed to get resume analysis with id: {resume_analysis_id}, error: {str(e)}"
+                f"Failed to get resume analysis with id: \
+                    {resume_analysis_id}, error: {str(e)}"
             )
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Internal server error occured while getting resume analysis by id",
+                detail="Internal server error occured while getting\
+                      resume analysis by id",
             )
 
     # ============= UPDATE OPERATIONS =============
-
-    @staticmethod
-    # async def update_resume(
-    #     resume_id: PydanticObjectId,
-    #     update_data: Dict[str, Any]
-    # ) -> Optional[Resume]:
-    #     """
-    #     Update resume with optimized field updates
-
-    #     Args:
-    #         resume_id: Resume ID to update
-    #         update_data: Fields to update
-    #         upsert: Create if doesn't exist
-
-    #     Returns:
-    #         Updated Resume document
-    #     """
-    #     # Handle primary resume logic
-    #     # if 'is_primary' in update_data and update_data['is_primary']:
-    #     #     resume = await Resume.get(resume_id)
-    #     #     if resume:
-    #     #         await ResumeRepository._ensure_single_primary_resume(resume.user_id, exclude_id=resume_id)
-
-    #     # Add updated timestamp
-    #     update_data['updated_at'] = datetime.utcnow()
-
-    #     # Use atomic update operations
-    #     resume = await Resume.get(resume_id)
-
-    #     if resume:
-    #         # Update existing document
-    #         for key, value in update_data.items():
-    #             setattr(resume, key, value)
-    #         await resume.save()
-    #         return resume
 
     @staticmethod
     async def update_resume_section(
@@ -817,7 +782,8 @@ class ResumeRepository:
         """CRUD function to delete resume analysis object
 
         Args:
-            resume_analysis_id (str): id of resume analysis object that needs to be deleted
+            resume_analysis_id (str): id of resume analysis object \
+                that needs to be deleted
 
         Raises:
             HTTPException: if resume analysis object not found
@@ -840,7 +806,8 @@ class ResumeRepository:
             await resume_analysis.delete()
             return {
                 "success": True,
-                "message": f"Resume analysis object with id {resume_analysis_id} deleted succesfully",
+                "message": f"Resume analysis object with id \
+                    {resume_analysis_id} deleted succesfully",
             }
         except Exception as e:
             raise HTTPException(
@@ -872,11 +839,13 @@ class ResumeRepository:
             # Check if the current user is the owner of the resume
             if str(resume.user_id) != user_id:
                 logger.warning(
-                    f"Unauthorized delete attempt by user_id: {user_id} for resume owned by {resume.user_id}"
+                    f"Unauthorized delete attempt by user_id: {user_id} \
+                        for resume owned by {resume.user_id}"
                 )
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Unauthorized access to delete resume; this resume doesn't belong to the user",
+                    detail="Unauthorized access to delete resume; this resume \
+                        doesn't belong to the user",
                 )
 
             # Delete associated resume analyses
@@ -884,7 +853,8 @@ class ResumeRepository:
                 {"resume_id": ObjectId(resume_id)}
             ).delete()
             logger.info(
-                f"Deleted {delete_result} resume_analysis documents associated with resume_id: {resume_id}"
+                f"Deleted {delete_result} resume_analysis documents associated \
+                    with resume_id: {resume_id}"
             )
 
             # Delete the resume itself
@@ -963,7 +933,7 @@ class ResumeRepository:
     async def get_top_scored_resumes(limit: int = 10) -> List[Resume]:
         """Get highest scored resumes"""
         return (
-            await Resume.find(Resume.analysis_score != None)
+            await Resume.find(Resume.analysis_score is not None)
             .sort([("analysis_score", DESCENDING)])
             .limit(limit)
             .to_list()

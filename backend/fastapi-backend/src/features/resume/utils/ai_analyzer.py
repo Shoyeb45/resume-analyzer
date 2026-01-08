@@ -1,5 +1,6 @@
 """
-Module which contains all the essential methods which involves communicating with AI and generate something
+Module which contains all the essential methods which involves communicating
+with AI and generate something
 """
 
 import logging
@@ -60,7 +61,8 @@ class AIAnalyzer:
     def get_mcq_for_skill_assessment(
         self, soft_skills: str, technical_skills: str
     ) -> Dict[str, Any] | None:
-        """Method to get MCQ questions based on provided soft skills and technical skills
+        """Method to get MCQ questions based on provided soft skills
+        and technical skills
 
         Args:
             soft_skills (str): soft skills separated by comma
@@ -140,7 +142,8 @@ class AIAnalyzer:
     def get_career_suggestions_based_on_score(
         self, skill_scores: List, overall_score: float
     ) -> Dict[str, Any]:
-        """Method to generate possible job role on the basis of the score and also strength and weakness
+        """Method to generate possible job role on the basis of the score and
+        also strength and weakness
 
         Args:
             skill_scores (List): Skill wise score
@@ -150,7 +153,8 @@ class AIAnalyzer:
             e: exception
 
         Returns:
-            dict: Dictionary containing all necessary information related to career suggestions
+            dict: Dictionary containing all necessary information related to
+            career suggestions
         """
         try:
             system_prompt, user_prompt = (
@@ -279,12 +283,14 @@ class AIAnalyzer:
         tech_stack: str,
         bullet_points: Optional[List[str]] = None,
     ) -> str:
-        """Method for generating suggestion for project section by providing existing points or creating new one
+        """Method for generating suggestion for project section by providing
+        existing points or creating new one
 
         Args:
             project_name (str): name of the project
             tech_stack (str): Tech stack used in project
-            bullet_points (Optional[List[str]], optional): Bullet points that user have given in request. Defaults to None.
+            bullet_points (Optional[List[str]], optional): Bullet points that user
+            have given in request. Defaults to None.
 
         Raises:
             e: exceptions
@@ -313,13 +319,16 @@ class AIAnalyzer:
         location: str,
         bullet_points: Optional[List[str]] = None,
     ) -> str:
-        """Method for generating suggestion for experience section by providing existing points or creating new one
+        """Method for generating suggestion for experience section by providing
+            existing points or creating new one
 
         Args:
-            organisation_name (str): Name of the organisation where the candidate was working
+            organisation_name (str): Name of the organisation
+                    where the candidate was working
             position (str): Position on which he was working
             location (str): Location of the orgnaisation
-            bullet_points (Optional[List[str]], optional): Bullet points that user have given in request. Defaults to None.
+            bullet_points (Optional[List[str]], optional): Bullet points that user
+            have given in request. Defaults to None.
 
         Raises:
             e: exceptions
@@ -351,7 +360,8 @@ class AIAnalyzer:
             e: exceptions
 
         Returns:
-            Dict[str, Any]: Python dictionary which contains information regarding ats score and some other scores also.
+            Dict[str, Any]: Python dictionary which contains information
+            regarding ats score and some other scores also.
         """
         try:
             system_prompt, user_prompt = self.prompt_creator._create_ats_prompt(
@@ -372,13 +382,16 @@ class AIAnalyzer:
         location: str,
         bullet_points: Optional[List[str]] = None,
     ) -> str:
-        """Method for generating suggestion for extracurricular section by providing existing points or creating new one
+        """
+        Method for generating suggestion for extracurricular section by
+        providing existing points or creating new one
 
         Args:
             organisation_name (str): Name of the organisation
             position (str): Position at which he did the activity
             location (str): Location of the extracurricular activity
-            bullet_points (Optional[List[str]], optional): Bullet points that user have given in request . Defaults to None.
+            bullet_points (Optional[List[str]], optional): Bullet points that user have
+                        given in request . Defaults to None.
 
         Raises:
             e: exceptions

@@ -261,7 +261,8 @@ def create_resume_model(
             return all(not value for value in obj.values())
 
     def has_meaningful_content(obj: dict) -> bool:
-        """Check if object has any meaningful content (non-empty strings, non-empty lists, etc.)"""
+        """Check if object has any meaningful
+        content (non-empty strings, non-empty lists, etc.)"""
         for value in obj.values():
             if isinstance(value, str) and value.strip():
                 return True

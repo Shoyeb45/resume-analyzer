@@ -25,7 +25,8 @@ router = APIRouter(prefix="/resume", tags=["resume"])
 # API endpoint to analyse and extract the resume details
 @router.post(
     "/analyse",
-    description="API endpoint which will analyse the resume and extract necessary details and keep it in database and give scores",
+    description="API endpoint which will analyse the resume and extract necessary \
+        details and keep it in database and give scores",
 )
 async def analyse_resume(
     background_tasks: BackgroundTasks,
@@ -106,7 +107,8 @@ async def resume_extraction(
 # API Endpoint to get questions related to skills
 @router.post(
     "/skill-assessment",
-    description="This will give 10 mcq questions based on soft and technical skills provided.",
+    description="This will give 10 mcq questions based on soft\
+          and technical skills provided.",
 )
 def get_mcq_questions(
     technical_skills: str = Form(...),
@@ -120,33 +122,39 @@ def get_mcq_questions(
         )
     except Exception as e:
         logger.error(
-            f"Failed to generate MCQ question based on skills provided, error : {str(e)}"
+            f"Failed to generate MCQ question based \
+                on skills provided, error : {str(e)}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate MCQ question based on skills provided, error : {str(e)}",
+            detail=f"Failed to generate MCQ question \
+                based on skills provided, error : {str(e)}",
         )
 
 
 # API Endpoint to get the score of the assessment
 @router.post(
     "/skill-assessment-score",
-    description="This will give comprehensive analysis of the assessment and also it will suggest some job roles.",
+    description="This will give comprehensive analysis of the assessment and also \
+        it will suggest some job roles.",
 )
 def get_assessment_score(
     skills: str = Form(...), user: dict = Depends(get_current_user)
 ):
     try:
-        """It will calculate skill assessment score and it will also suggest some job roles depending upon the score"""
+        """It will calculate skill assessment score and it will also \
+            suggest some job roles depending upon the score"""
         logger.info("Skill-assessment-score API called")
         return resume_analyzer.analyse_assessment_score(skills)
     except Exception as e:
         logger.error(
-            f"Failed to analyse MCQ question based on provided skill wise scores, error: {str(e)}"
+            f"Failed to analyse MCQ question based on provided \
+                skill wise scores, error: {str(e)}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to analyse MCQ question based on provided skill wise scores, error: {str(e)}",
+            detail=f"Failed to analyse MCQ question based on \
+                provided skill wise scores, error: {str(e)}",
         )
 
 
@@ -178,18 +186,21 @@ def get_project_description_suggestion(
     try:
         user_id = user["user_id"]
         logger.info(
-            f"Project endpoint called to get AI generated description point, called by user - {user_id}"
+            f"Project endpoint called to get AI generated description point, \
+                called by user - {user_id}"
         )
         return resume_analyzer.get_project_enhanced_description(
             project_name, tech_stack, bullet_points
         )
     except Exception as e:
         logger.error(
-            f"Failed to generate AI Suggestion for project section, error message: {str(e)}"
+            f"Failed to generate AI Suggestion for project section, \
+                error message: {str(e)}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate AI suggestion for project section, ErrorMessage: {str(e)}",
+            detail=f"Failed to generate AI suggestion for project \
+                section, ErrorMessage: {str(e)}",
         )
 
 
@@ -204,18 +215,21 @@ async def get_experience_description_suggestion(
 ):
     try:
         logger.info(
-            f"Experience endpoint called to get AI generated description point, called by user-{user['user_id']}"
+            f"Experience endpoint called to get AI generated description point, \
+                called by user-{user['user_id']}"
         )
         return resume_analyzer.get_experience_enhanced_description(
             organisation_name, position, location, bullet_points
         )
     except Exception as e:
         logger.error(
-            f"Failed to generate AI Suggestion for experience section, error message: {str(e)}"
+            f"Failed to generate AI Suggestion for experience section, \
+                error message: {str(e)}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate AI suggestion for project experience, ErrorMessage: {str(e)}",
+            detail=f"Failed to generate AI suggestion for \
+                project experience, ErrorMessage: {str(e)}",
         )
 
 
@@ -233,7 +247,8 @@ async def get_extracurricular_description_suggestion(
 ):
     try:
         logger.info(
-            f"Extracurricular endpoint called to get AI generated description point, called by user-{user['user_id']}"
+            f"Extracurricular endpoint called to get AI generated \
+                description point, called by user-{user['user_id']}"
         )
 
         return resume_analyzer.get_extracurricular_enhanced_description(
@@ -241,11 +256,13 @@ async def get_extracurricular_description_suggestion(
         )
     except Exception as e:
         logger.error(
-            f"Failed to generate AI Suggestion for extracurricular section, error message: {str(e)}"
+            f"Failed to generate AI Suggestion for extracurricular \
+                section, error message: {str(e)}"
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate AI suggestion for extracurricular experience, error message: {str(e)}",
+            detail=f"Failed to generate AI suggestion for extracurricular \
+                experience, error message: {str(e)}",
         )
 
 

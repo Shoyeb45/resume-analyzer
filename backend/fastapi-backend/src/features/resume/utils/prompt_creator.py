@@ -11,12 +11,17 @@ class PromptCreator:
         target_role: str,
         job_description: str,
     ) -> str:
-        """Create a precise and structured prompt for resume analysis, ensuring JSON-only output."""
+        """Create a precise and structured prompt for resume analysis,
+        ensuring JSON-only output."""
 
         system_prompt = """
-You are a highly experienced Resume Analyst with over 15 years in talent acquisition, career development, and ATS optimization.
+You are a highly experienced Resume Analyst with over 15 years in talent acquisition, 
+career development, and ATS optimization.
+
 🛠 OBJECTIVE:
-You must analyze a resume against a specific job description and role. Return *only* a strictly valid JSON object summarizing the analysis.
+You must analyze a resume against a specific job description and role. 
+Return *only* a strictly valid JSON object summarizing the analysis.
+
 🚫 RESTRICTIONS:
 - Do NOT include explanations, markdown, comments, or natural language outside the JSON.
 - Do NOT wrap JSON in code blocks or add any leading/trailing text.
@@ -37,17 +42,21 @@ You must analyze a resume against a specific job description and role. Return *o
   ],
   "job_fit_assessment": {
     "score": 82,  // Integer from 1–100
-    "notes": "Critical evaluation of alignment with job requirements and potential growth"
+    "notes": "Critical evaluation of alignment with job requirements \
+      and potential growth"
   },
   "recommendation_score": 82,  // Integer from 1–100
-  "resume_summary": "Concise and compelling 2-3 sentence summary of the candidate's profile and fit for the role.",
+  "resume_summary": "Concise and compelling 2-3 sentence summary of the \
+    candidate's profile and fit for the role.",
   "matched_skills": [
     "react", "python", "dataanalysis" 
-    // One-word technical or domain-relevant keywords derived from job description and resume
+    // One-word technical or domain-relevant keywords
+    // derived from job description and resume
   ],
   "missing_skills": [
     "typescript", "cloud", "agile"
-    // One-word technical or domain-relevant keywords derived from job description and resume that is missing
+    // One-word technical or domain-relevant keywords derived from job 
+    // description and resume that is missing
   ]
 }
 ✅ EVALUATION GUIDELINES:
@@ -58,19 +67,21 @@ You must analyze a resume against a specific job description and role. Return *o
 5. Overall presentation, clarity, and professionalism""".strip()
 
         user_prompt = f"""
-        Analyze the following resume for its suitability for the role below and provide your analysis in the defined JSON structure only.
+- Analyze the following resume for its suitability for the role below and provide your 
+  analysis in the defined JSON structure only.
 
-        🎯 TARGET ROLE:
-        {target_role}
+🎯 TARGET ROLE:
+{target_role}
 
-        📄 JOB DESCRIPTION:
-        {job_description or "No specific JD provided — perform general analysis based on industry norms."}
+📄 JOB DESCRIPTION:
+{job_description or "No specific JD provided — perform "
+"general analysis based on industry norms."}
 
-        📌 RESUME CONTENT:
-        {text}
+📌 RESUME CONTENT:
+{text}
 
-        Follow the evaluation criteria strictly and return only the JSON object as instructed.
-        """.strip()
+Follow the evaluation criteria strictly and return only the JSON object as instructed.
+""".strip()
 
         return system_prompt, user_prompt
 
@@ -79,7 +90,8 @@ You must analyze a resume against a specific job description and role. Return *o
     ) -> str:
         """Create prompt for resume scoring"""
 
-        system_prompt = """You are an expert resume evaluator specializing in ATS scoring and resume assessment.
+        system_prompt = """
+You are an expert resume evaluator specializing in ATS scoring and resume assessment.
 
 Your task is to rate resumes out of 100 based on the following criteria:
 - Relevance to the target role
@@ -121,7 +133,9 @@ Provide your assessment in the specified JSON format."""
     ) -> str:
         """Create prompt for section improvement"""
 
-        system_prompt = """You are an expert resume writer specializing in optimizing resume sections for maximum impact.
+        system_prompt = """
+You are an expert resume writer specializing in optimizing resume sections 
+for maximum impact.
 
 Your task is to improve resume sections to make them:
 - More impactful and results-oriented
@@ -131,7 +145,8 @@ Your task is to improve resume sections to make them:
 
 Focus on enhancing the content while maintaining authenticity."""
 
-        user_prompt = f"""Please improve this {section_name} section for the specified role:
+        user_prompt = f"""
+Please improve this {section_name} section for the specified role:
 
 TARGET ROLE: {target_role}
 
@@ -140,7 +155,8 @@ JOB DESCRIPTION: {job_description[:300] if job_description else "General improve
 ORIGINAL {section_name.upper()} SECTION:
 {section_text}
 
-Provide an improved version of this section that is more impactful, ATS-friendly, and relevant to the target role."""
+- Provide an improved version of this section that is more impactful, 
+  ATS-friendly, and relevant to the target role."""
 
         return system_prompt, user_prompt
 
@@ -149,7 +165,9 @@ Provide an improved version of this section that is more impactful, ATS-friendly
     ) -> str:
         """Create prompt for complete resume generation"""
 
-        system_prompt = """You are an expert resume writer specializing in creating professional, ATS-optimized resumes.
+        system_prompt = """
+You are an expert resume writer specializing in creating professional, 
+ATS-optimized resumes.
 
 Your task is to create complete, well-structured resumes that include:
 - Professional Summary
@@ -166,7 +184,8 @@ Format requirements:
 - Maintain professional formatting
 - Focus on quantifiable achievements"""
 
-        user_prompt = f"""Please create a professional, ATS-optimized resume for the following role:
+        user_prompt = f"""
+Please create a professional, ATS-optimized resume for the following role:
 
 TARGET ROLE: {target_role}
 
@@ -182,9 +201,12 @@ Generate a complete, well-structured resume based on the provided information.""
     def _create_career_suggestion_prompt(
         self, skill_scores: List, overall_score: float
     ) -> str:
-        system_prompt = """You are an expert career mentor with extensive experience in career guidance and skill assessment.
+        system_prompt = """
+You are an expert career mentor with extensive experience in career 
+guidance and skill assessment.
 
-Your task is to provide career suggestions based on skill scores and overall performance. You need to analyze the data and provide:
+- Your task is to provide career suggestions based on skill scores and overall 
+  performance. You need to analyze the data and provide:
 
 1. Role suggestions with match percentages
 2. Candidate strengths and reasons
@@ -207,8 +229,8 @@ RESPONSE FORMAT:
     ],
     "improvement_areas": [
         {
-            "skill": "Name of the skill where candidate needs improvement",
-            "improvement_point": "What improvement does the candidate need in this skill" 
+          "skill": "Name of the skill where candidate needs improvement",
+          "improvement_point": "What improvement does the candidate need in this skill" 
         }
     ],
     "tips": [
@@ -220,13 +242,15 @@ RESPONSE FORMAT:
 
 NOTE: Only return JSON object and nothing else."""
 
-        user_prompt = f"""Based on the following skill assessment data, provide career suggestions:
+        user_prompt = f"""
+Based on the following skill assessment data, provide career suggestions:
 
 SKILL SCORES: {str(skill_scores)}
 
 OVERALL SCORE: {overall_score}
 
-Analyze this data and provide role suggestions, strengths, improvement areas, and tips in the specified JSON format."""
+Analyze this data and provide role suggestions, strengths, improvement areas, 
+and tips in the specified JSON format."""
 
         return system_prompt, user_prompt
 
@@ -234,9 +258,12 @@ Analyze this data and provide role suggestions, strengths, improvement areas, an
         self, text: str, target_role: str, job_description: str
     ) -> str:
         """Create prompt for resume analysis returning only a JSON object"""
-        system_prompt = """You are a professional resume evaluation expert specializing in section-by-section analysis.
+        system_prompt = """
+You are a professional resume evaluation expert specializing in section-by-section 
+analysis.
 
-Your task is to analyze resume sections and provide detailed feedback for each section including:
+- Your task is to analyze resume sections and provide detailed feedback for 
+  each section including:
 - Brief description of the section
 - Good points
 - Areas needing improvement
@@ -289,7 +316,8 @@ IMPORTANT:
 - If a section is not found, set arrays to [] and overall_review to "Needs Improvement"
 - Return ONLY the JSON object, no explanations"""
 
-        user_prompt = f"""Please analyze the following resume sections for the specified role:
+        user_prompt = f"""
+Please analyze the following resume sections for the specified role:
 
 TARGET ROLE: {target_role}
 
@@ -304,9 +332,12 @@ Provide a detailed section-by-section analysis in the specified JSON format."""
 
     def _create_skill_assessment_prompt(self, technical_skills: str, soft_skills: str):
 
-        system_prompt = """You are an expert assessment generator specializing in creating comprehensive skill evaluations.
+        system_prompt = """
+You are an expert assessment generator specializing in creating comprehensive 
+   skill evaluations.
 
-Your task is to generate 10 multiple choice questions that test understanding and practical knowledge of both technical and soft skills.
+- Your task is to generate 10 multiple choice questions that test understanding and 
+  practical knowledge of both technical and soft skills.
 
 Requirements for each question:
 - 1 clear correct answer
@@ -331,15 +362,21 @@ RESPONSE FORMAT:
   ]
 }
 
-Do not include any explanations, comments, or markdown. Output only the pure JSON object."""
+- Do not include any explanations, comments, or markdown. Output only the 
+  pure JSON object.
+"""
 
-        user_prompt = f"""Generate 10 multiple choice questions based on the following skills:
+        user_prompt = f"""
+Generate 10 multiple choice questions based on the following skills:
 
 TECHNICAL SKILLS: {technical_skills}
 
 SOFT SKILLS: {soft_skills}
 
-Create questions that test both theoretical knowledge and practical application of these skills. Return the assessment in the specified JSON format."""
+- Create questions that test both theoretical knowledge and practical application of 
+  these skills. 
+- Return the assessment in the specified JSON format.
+"""
 
         return system_prompt, user_prompt
 
@@ -356,9 +393,12 @@ Create questions that test both theoretical knowledge and practical application 
         if not description:
             description = ["Description not provided. You must create it from scratch."]
 
-        system_prompt = f"""You are a resume writing assistant specializing in creating strong professional experience descriptions.
+        system_prompt = f"""
+You are a resume writing assistant specializing in creating strong professional 
+experience descriptions.
 
-Your task is to generate {len(description)} impactful bullet points for a work experience entry.
+Your task is to generate {len(description)} impactful bullet points for a 
+work experience entry.
 
 Requirements:
 - Write in third person and keep it resume-appropriate
@@ -371,14 +411,16 @@ Requirements:
 
 Return ONLY the final improved bullet points in the specified format."""
 
-        user_prompt = f"""Please generate professional experience bullet points for:
+        user_prompt = f"""
+Please generate professional experience bullet points for:
 
 ORGANISATION: {organisation_name}
 POSITION: {position}
 LOCATION: {location}
 EXISTING POINTS: {description}
 
-Create {len(description)} enhanced bullet points that highlight achievements and impact."""
+Create {len(description)} enhanced bullet points that highlight 
+achievements and impact."""
 
         return system_prompt, user_prompt
 
@@ -394,9 +436,12 @@ Create {len(description)} enhanced bullet points that highlight achievements and
                 "Bullet points not provided. You must create it from scratch."
             ]
 
-        system_prompt = f"""You are a resume writing assistant specializing in presenting extracurricular activities professionally.
+        system_prompt = f"""
+You are a resume writing assistant specializing in presenting extracurricular 
+activities professionally.
 
-Your task is to generate exactly {len(description)} bullet point(s) for an extracurricular activity.
+Your task is to generate exactly {len(description)} bullet point(s) for an 
+extracurricular activity.
 
 Requirements:
 - Write in third person, past tense
@@ -409,14 +454,16 @@ Requirements:
 
 Return only the final improved bullet points in the specified format."""
 
-        user_prompt = f"""Please generate professional extracurricular activity bullet points for:
+        user_prompt = f"""
+Please generate professional extracurricular activity bullet points for:
 
 ORGANISATION: {organisation_name}
 POSITION: {position}
 LOCATION: {location}
 EXISTING BULLET POINTS: {description}
 
-Create {len(description)} enhanced bullet point(s) that showcase leadership, impact, and skills developed."""
+Create {len(description)} enhanced bullet point(s) that showcase leadership, 
+impact, and skills developed."""
 
         return system_prompt, user_prompt
 
@@ -430,9 +477,12 @@ Create {len(description)} enhanced bullet point(s) that showcase leadership, imp
         if not bullet_points:
             bullet_points = []
 
-        system_prompt = f"""You are a technical resume writer specializing in project portfolio presentation.
+        system_prompt = f"""
+You are a technical resume writer specializing in project portfolio presentation.
 
-Your task is to create {len(bullet_points)} enhanced technical bullet points that demonstrate:
+Your task is to create {len(bullet_points)} enhanced technical bullet points 
+that demonstrate:
+
 1. Technical proficiency and problem-solving
 2. Innovative solutions and methodologies
 3. Project impact and user value
@@ -456,164 +506,175 @@ PROJECT NAME: {project_name}
 TECHNOLOGIES: {tech_stack}
 CURRENT POINTS: {str(bullet_points)}
 
-Generate exactly {len(bullet_points)} enhanced technical bullet points that showcase technical expertise and project impact."""
+Generate exactly {len(bullet_points)} enhanced technical bullet points that 
+showcase technical expertise and project impact."""
 
         return system_prompt, user_prompt
 
     def _create_resume_parser_prompt(self, text: str):
 
-        system_prompt = """You are an expert resume parser specializing in extracting structured data from resumes.
+        system_prompt = """
+You are an expert resume parser specializing in extracting structured data from resumes.
 
-    Your task is to extract resume information and format it as a JSON object with the following structure:
+- Your task is to extract resume information and format it as a 
+  JSON object with the following structure:
 
-    {
-      "resume_details": {
-        "personal_info": {
-          "name": "candidate full name",
-          "contact_info": {
-            "email": "email address",
-            "mobile": "phone number",
-            "location": "city, state/country",
-            "social_links": {
-              "linkedin": "linkedin profile url",
-              "github": "github profile url",
-              "portfolio": "portfolio website url"
-            }
-          },
-          "professional_summary": "professional summary or objective"
-        },
-        "educations": [
-          {
-            "institute_name": "university/college name",
-            "degree": "degree type",
-            "specialisation": "field of study",
-            "dates": {
-              "start": "start date",
-              "end": "end date or 'Present'"
-            },
-            "location": "institute location",
-            "gpa": "GPA/percentage if mentioned",
-            "relevant_coursework": ["course1", "course2"]
-          }
-        ],
-        "work_experiences": [
-          {
-            "company_name": "company name",
-            "job_title": "position title",
-            "date": {
-              "start": "start date",
-              "end": "end date or 'Present'"
-            },
-            "location": "work location",
-            "bullet_points": ["responsibility 1", "responsibility 2"]
-          }
-        ],
-        "projects": [
-          {
-            "title": "project name",
-            "project_link": "project url if available",
-            "date": {
-              "start": "start date",
-              "end": "end date"
-            },
-            "location": "project location if applicable",
-            "organization": "associated organization if any",
-            "bullet_points": ["key point 1", "key point 2"],
-            "technologies_used": ["tech1", "tech2"]
-          }
-        ],
-        "technical_skills": [
-          {
-            "skill_group": "Programming Languages",
-            "skills": ["Python", "Java", "JavaScript"]
-          }
-        ],
-        "soft_skills": [
-          {
-            "skill_group": "Programming Languages",
-            "skills": ["Python", "Java", "JavaScript"]
-          }
-        ],
-        "achievements": [
-          {
-            "title": "achievement title",
-            "description": "achievement description",
-            "date_achieved": "date of achievement or null",
-            "organization": "awarding organization or null"
-          }
-        ],
-        "certifications": [
-          {
-            "certificate_name": "certification name",
-            "issuing_organization": "issuing body",
-            "date_issued": "issue date or null",
-            "expiry_date": "expiry date or null",
-            "description": "certification description"
-          }
-        ],
-        "languages": [
-          {
-            "language": "language name",
-            "proficiency": "proficiency level"
-          }
-        ],
-        "publications": [
-          {
-            "publication_name": "publication title",
-            "authors": ["author1", "author2"],
-            "publication_date": "publication date",
-            "journal_conference": "journal or conference name",
-            "description": "brief description"
-          }
-        ],
-        "extracurriculars": [
-          {
-            "title": "activity title",
-            "organization_name": "organization name",
-            "role": "role/position held",
-            "date": {
-              "start": "start date",
-              "end": "end date"
-            },
-            "bullet_points": ["activity detail 1", "activity detail 2"],
-            "certificate": "certificate link or null",
-            "location": "activity location"
-          }
-        ]
+{
+  "resume_details": {
+    "personal_info": {
+      "name": "candidate full name",
+      "contact_info": {
+        "email": "email address",
+        "mobile": "phone number",
+        "location": "city, state/country",
+        "social_links": {
+          "linkedin": "linkedin profile url",
+          "github": "github profile url",
+          "portfolio": "portfolio website url"
+        }
       },
-    }
+      "professional_summary": "professional summary or objective"
+    },
+    "educations": [
+      {
+        "institute_name": "university/college name",
+        "degree": "degree type",
+        "specialisation": "field of study",
+        "dates": {
+          "start": "start date",
+          "end": "end date or 'Present'"
+        },
+        "location": "institute location",
+        "gpa": "GPA/percentage if mentioned",
+        "relevant_coursework": ["course1", "course2"]
+      }
+    ],
+    "work_experiences": [
+      {
+        "company_name": "company name",
+        "job_title": "position title",
+        "date": {
+          "start": "start date",
+          "end": "end date or 'Present'"
+        },
+        "location": "work location",
+        "bullet_points": ["responsibility 1", "responsibility 2"]
+      }
+    ],
+    "projects": [
+      {
+        "title": "project name",
+        "project_link": "project url if available",
+        "date": {
+          "start": "start date",
+          "end": "end date"
+        },
+        "location": "project location if applicable",
+        "organization": "associated organization if any",
+        "bullet_points": ["key point 1", "key point 2"],
+        "technologies_used": ["tech1", "tech2"]
+      }
+    ],
+    "technical_skills": [
+      {
+        "skill_group": "Programming Languages",
+        "skills": ["Python", "Java", "JavaScript"]
+      }
+    ],
+    "soft_skills": [
+      {
+        "skill_group": "Programming Languages",
+        "skills": ["Python", "Java", "JavaScript"]
+      }
+    ],
+    "achievements": [
+      {
+        "title": "achievement title",
+        "description": "achievement description",
+        "date_achieved": "date of achievement or null",
+        "organization": "awarding organization or null"
+      }
+    ],
+    "certifications": [
+      {
+        "certificate_name": "certification name",
+        "issuing_organization": "issuing body",
+        "date_issued": "issue date or null",
+        "expiry_date": "expiry date or null",
+        "description": "certification description"
+      }
+    ],
+    "languages": [
+      {
+        "language": "language name",
+        "proficiency": "proficiency level"
+      }
+    ],
+    "publications": [
+      {
+        "publication_name": "publication title",
+        "authors": ["author1", "author2"],
+        "publication_date": "publication date",
+        "journal_conference": "journal or conference name",
+        "description": "brief description"
+      }
+    ],
+    "extracurriculars": [
+      {
+        "title": "activity title",
+        "organization_name": "organization name",
+        "role": "role/position held",
+        "date": {
+          "start": "start date",
+          "end": "end date"
+        },
+        "bullet_points": ["activity detail 1", "activity detail 2"],
+        "certificate": "certificate link or null",
+        "location": "activity location"
+      }
+    ]
+  },
+}
 
-    PARSING RULES:
-    1. Extract information ONLY if explicitly mentioned in the resume
-    2. For missing array/list fields (like certifications, achievements, languages, etc.), use EMPTY ARRAYS [] - do NOT create objects with null values
-    3. Use empty strings "" for missing string fields
-    4. Use null for missing object fields
-    5. Preserve original date formats when possible
-    6. Group skills logically by category
-    7. Include all bullet points as separate array elements
-    8. Extract URLs exactly as written
+PARSING RULES:
+1. Extract information ONLY if explicitly mentioned in the resume
+2. For missing array/list fields (like certifications, achievements, languages, etc.), 
+   use EMPTY ARRAYS [] - do NOT create objects with null values
+3. Use empty strings "" for missing string fields
+4. Use null for missing object fields
+5. Preserve original date formats when possible
+6. Group skills logically by category
+7. Include all bullet points as separate array elements
+8. Extract URLs exactly as written
 
-    CRITICAL INSTRUCTIONS:
-    - If NO certifications are found, return: "certifications": []
-    - If NO achievements are found, return: "achievements": []
-    - If NO languages are found, return: "languages": []
-    - If NO publications are found, return: "publications": []
-    - DO NOT create placeholder objects with null values for missing data
-    - Only include actual data that exists in the resume
+CRITICAL INSTRUCTIONS:
+- If NO certifications are found, return: "certifications": []
+- If NO achievements are found, return: "achievements": []
+- If NO languages are found, return: "languages": []
+- If NO publications are found, return: "publications": []
+- DO NOT create placeholder objects with null values for missing data
+- Only include actual data that exists in the resume
 
-    CRITICAL: Return ONLY the JSON object. No explanations, no markdown, no additional text."""
+CRITICAL: Return ONLY the JSON object. No explanations, no markdown, no additional text.
 
-        user_prompt = f"""Please extract and structure the following resume data:
+"""
 
-    RESUME TEXT:
-    {text}
+        user_prompt = f"""
+Please extract and structure the following resume data:
 
-    Parse this resume and return the structured data in the specified JSON format. Remember: use empty arrays [] for missing list data, not objects with null values."""
+RESUME TEXT:
+{text}
+
+Parse this resume and return the structured data in the specified JSON format. 
+Remember: use empty arrays [] for missing list data, not objects with null values.
+"""
 
         return system_prompt, user_prompt
 
     def _create_ats_prompt(self, resume_data: dict) -> str:
-        system_prompt = """You are an advanced Applicant Tracking System (ATS) evaluator specializing in resume assessment.
+        system_prompt = """
+You are an advanced Applicant Tracking System (ATS) evaluator 
+specializing in resume assessment.
 
 Your task is to evaluate resumes based on 3 key criteria:
 
@@ -635,7 +696,8 @@ Your task is to evaluate resumes based on 3 key criteria:
    - Professional language quality
    - Logical content organization
 
-For each category, provide a score out of 100, followed by an overall ATS Score (weighted).
+For each category, provide a score out of 100, followed by an overall 
+ATS Score (weighted).
 
 RESPONSE FORMAT:
 {
@@ -671,7 +733,8 @@ Assume the resume is written in clean and ATS-compatible LaTeX format."""
         # Education
         education_details = []
         for edu in resume_data.get("educations", []):
-            edu_line = f"{edu.get('institute_name')} - {edu.get('degree')} ({edu.get('gpa', 'N/A')})"
+            edu_line = f"{edu.get('institute_name')} - {edu.get('degree')} \
+                        ({edu.get('gpa', 'N/A')})"
             education_details.append(edu_line)
 
         # Achievements

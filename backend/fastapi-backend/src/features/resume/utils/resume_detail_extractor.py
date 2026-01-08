@@ -166,7 +166,8 @@ class ResumeDetailsExtractor:
 
     def create_resume_parser_prompt(self, text: str):
         prompt = f"""EXTRACT RESUME DATA TO JSON ONLY.
-CRITICAL: Please return ONLY the JSON object. No explanations, no markdown, no additional text. Start with {{ and end with }}.
+CRITICAL: Please return ONLY the JSON object. No explanations, no markdown, 
+no additional text. Start with {{ and end with }}.
 JSON SCHEMA:
 {{
 "resume_details": {{
@@ -207,7 +208,7 @@ JSON SCHEMA:
         "end": "end date or 'Present'"
         }},
         "location": "work location",
-        "bullet_points": ["responsibility/achievement 1", "responsibility/achievement 2"]
+        "bullet_points": ["responsibility/achievement 1","responsibility/achievement-2"]
     }}
     ],
     "projects": [
