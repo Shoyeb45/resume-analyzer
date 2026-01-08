@@ -29,6 +29,8 @@ export const generateTokenAndSetCookie = async (
     secure: isProduction,
     sameSite: "strict",
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+    domain: isProduction ? process.env.COOKIE_DOMAIN: undefined,
+    path: '/'
   });
 
   return token;

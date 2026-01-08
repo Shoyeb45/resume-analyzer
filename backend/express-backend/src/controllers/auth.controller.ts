@@ -6,7 +6,7 @@ import {
   sendResetSuccessEmail,
   sendVerificationEmail,
   sendWelcomeEmail,
-} from "../mailtrap/emails.js";
+} from "../mail-service/emails.js";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
 import {prisma} from "../config/db.js"
@@ -210,14 +210,15 @@ export const regenerateVerificationToken = asyncHandler(
 );
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-    const isProduction = process.env.NODE_ENV
-  ? process.env.NODE_ENV === "production"
-  : true; 
+  const isProduction = process.env.NODE_ENV === "production";
 
   res.clearCookie("token", {
     httpOnly: true,
     secure: isProduction,
     sameSite: "strict",
+    // Add these missing properties:
+    domain: isProduction ? process.env.COOKIE_DOMAIN : undefined, // Match your production domain
+    path: "/", // Explicitly set path
   });
 
   res.status(200).json({
