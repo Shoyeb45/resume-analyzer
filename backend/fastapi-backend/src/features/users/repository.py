@@ -7,9 +7,9 @@ from beanie import PydanticObjectId
 from fastapi import HTTPException, status
 
 from features.resume.models import Resume
+from features.users.models import User
 
 logger = logging.getLogger(__name__)
-from features.users.models import User
 
 
 class UserRepository:
@@ -68,7 +68,8 @@ class UserRepository:
             if update_fields:
                 await user_doc.update({"$set": update_fields})
                 logger.info(
-                    f"User details updated successfully for user with user-id: {user['user_id']}"
+                    f"User details updated successfully for user with \
+                        user-id: {user['user_id']}"
                 )
             else:
                 logger.info("No valid fields to update")
@@ -79,7 +80,8 @@ class UserRepository:
             logger.error(f"Failed to parse json, error: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                detail="Provided detail about user is not json string, invalid json format",
+                detail="Provided detail about user is not json string, "
+                "invalid json format",
             )
         except Exception as e:
             logger.error(
@@ -112,7 +114,8 @@ class UserRepository:
                 best_score = max(ats_scores) if ats_scores else 0.0
                 total_resumes = len(resumes)
                 logger.info(
-                    f"User {user_id} has {total_resumes} resumes with best ATS score: {best_score}"
+                    f"User {user_id} has {total_resumes} resumes with \
+                    best ATS score: {best_score}"
                 )
 
             return {

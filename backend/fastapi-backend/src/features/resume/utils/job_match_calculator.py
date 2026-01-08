@@ -17,7 +17,8 @@ class JobMatchCalculator:
         self, resume_text: str, job_description: str
     ) -> float:
         """
-        Calculate similarity score between resume and job description using TF-IDF and cosine similarity
+        Calculate similarity score between resume and job description using TF-IDF
+        and cosine similarity
 
         Args:
             resume_text (str): Resume text

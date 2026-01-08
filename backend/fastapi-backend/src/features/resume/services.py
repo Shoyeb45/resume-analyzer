@@ -91,17 +91,12 @@ class ResumeAnalyzer:
             resume_details: Dict[str, Any] = self.ai_analyzer.get_resume_details(
                 text=resume_text
             )
-            # personal_info = self.personal_info_extractor.extract_personal_info(resume_text)
 
             # Step 3: Perform NLP analysis
             logger.info("Step 3: Performing NLP analysis - skip....")
-            # nlp_analysis = self.nlp_analyzer.analyze_text_with_nlp(resume_text, target_role)
 
             # Step 4: Analyze skills
             logger.info("Step 4: Analyzing skills, skipped...")
-            # get tech skills and soft skills
-
-            # tech_skills, soft_skills = self.skills_analyzer.detect_skills_by_groups(resume_text)
 
             # Step 5: Match skills with job description
             logger.info("Step 5: Matching skills with job description")
@@ -165,7 +160,8 @@ class ResumeAnalyzer:
             resume_details_for_db["ats_score"] = float(ats_score["ats_score"])
 
             logger.info(
-                "Step 10: Updating database in background with both resume analysis and resume details"
+                "Step 10: Updating database in background with both \
+                    resume analysis and resume details"
             )
 
             llm_analysis = {
@@ -209,7 +205,8 @@ class ResumeAnalyzer:
 
             response = {
                 "success": True,
-                "message": "Successfully analysed resume and update the resume in database",
+                "message": "Successfully analysed resume and update \
+                    the resume in database",
                 "resume_metadata": resume_metadata,
                 "resume_analysis": resume_analysis,
                 "job_title": target_role,
@@ -269,7 +266,8 @@ class ResumeAnalyzer:
             )
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error while generating project description, error message: {str(e)}",
+                detail=f"Error while generating project description,\
+                      error message: {str(e)}",
             )
 
     def get_experience_enhanced_description(
@@ -299,11 +297,13 @@ class ResumeAnalyzer:
             }
         except Exception as e:
             logger.error(
-                f"Error while generating experience description, error message: {str(e)}"
+                f"Error while generating experience description, \
+                    error message: {str(e)}"
             )
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detils=f"Error while generating experience description, error message: {str(e)}",
+                detils=f"Error while generating experience description, \
+                    error message: {str(e)}",
             )
 
     def get_extracurricular_enhanced_description(
@@ -336,11 +336,13 @@ class ResumeAnalyzer:
             }
         except Exception as e:
             logger.error(
-                f"Error while generating extracurricular description, error message: {str(e)}"
+                f"Error while generating extracurricular \
+                    description, error message: {str(e)}"
             )
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detils=f"Error while generating extracurricular description, error message: {str(e)}",
+                detils=f"Error while generating extracurricular \
+                    description, error message: {str(e)}",
             )
 
     def improve_resume_section(
@@ -457,11 +459,13 @@ class ResumeAnalyzer:
             return result
         except Exception as e:
             logger.error(
-                f"Failed to generate MCQ question based on skills provided, error : {str(e)}"
+                f"Failed to generate MCQ question based on \
+                    skills provided, error : {str(e)}"
             )
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to generate MCQ question based on skills provided, error : {str(e)}",
+                detail=f"Failed to generate MCQ question based on \
+                    skills provided, error : {str(e)}",
             )
 
     def analyse_assessment_score(self, skills: str):
@@ -482,7 +486,8 @@ class ResumeAnalyzer:
                     error: {str(e)}"
                 )
                 raise HTTPException(
-                    detail=f"Failed to convert skills json string into python object, error: {str(e)}",
+                    detail=f"Failed to convert skills json string into \
+                        python object, error: {str(e)}",
                     status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 )
 
@@ -493,7 +498,8 @@ class ResumeAnalyzer:
             )
             return {
                 "status": True,
-                "message": "Succesfully analyzed the result and provided career suggestion",
+                "message": "Succesfully analyzed the result and \
+                            provided career suggestion",
                 "overall_score": overall_score,
                 "skill_wise_scores": skill_scores,
                 "career_suggestions": suggestions,
@@ -511,11 +517,13 @@ class ResumeAnalyzer:
 
         Args:
 
-            skills: List of an object which contains skill, total_question and number of correct question answered.
+            skills: List of an object which contains skill, total_question and number
+            of correct question answered.
 
         Returns:
 
-            Tuple where first member is overall score and second one is list of an object which contains name of the skill and score of the skill
+            Tuple where first member is overall score and second one is list
+            of an object which contains name of the skill and score of the skill
         """
         skill_scores = []
         total_score = 0
@@ -546,7 +554,8 @@ class ResumeAnalyzer:
             if file_path is None:
                 raise HTTPException(
                     status_code=500,
-                    detail="Failed to extract details from resume, resume file not found",
+                    detail="Failed to extract details from resume, \
+                        resume file not found",
                 )
 
             logger.info("Step-1: extract the text from resume")
@@ -579,7 +588,8 @@ class ResumeAnalyzer:
             }
 
             logger.info(
-                f"Adding background task for saving resume data for user with id {user_id} in database"
+                f"Adding background task for saving resume data for \
+                    user with id {user_id} in database"
             )
             resume = await resume_repository.create_resume(
                 user_id, resume_metadata, resume_details
@@ -587,7 +597,8 @@ class ResumeAnalyzer:
 
             result = {
                 "success": True,
-                "message": "Successfully extracted details from resume and updated the resume in database",
+                "message": "Successfully extracted details from resume and \
+                    updated the resume in database",
                 "resume_metadata": resume_metadata,
                 "resume_details": resume,
             }
@@ -613,15 +624,18 @@ class ResumeAnalyzer:
                 )
                 raise HTTPException(
                     status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                    detail=f"Invalid json format of the provided resume data, error: {str(js)}",
+                    detail=f"Invalid json format of the provided \
+                        resume data, error: {str(js)}",
                 )
             except Exception as e:
                 logger.error(
-                    f"Failed to convert resume json text to correct json format, error: {str(e)}"
+                    f"Failed to convert resume json text to correct json\
+                        format, error: {str(e)}"
                 )
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Failed to convert resume json text to correct json format, error: {str(e)}",
+                    detail=f"Failed to convert resume json text to \
+                        correct json format, error: {str(e)}",
                 )
 
             ats_score = self.ai_analyzer.get_ats_score(resume_data=resume_data)

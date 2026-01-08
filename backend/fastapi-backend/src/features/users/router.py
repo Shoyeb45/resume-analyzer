@@ -24,11 +24,12 @@ async def change_user_details(
 ):
     """
 
-        ```
     Args:
         user (dict, optional): _description_. Defaults to Depends(get_current_user).
-        user_detail (Optional[str], optional): above json in string. Defaults to Form(None).
+        user_detail (Optional[str], optional): above json in string.
+            Defaults to Form(None).
+
     Returns:
-        _type_: _description_
+        Response: changed user detail
     """
     return await user_repositroy.change_user_details(user, user_details)

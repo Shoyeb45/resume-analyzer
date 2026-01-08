@@ -25,7 +25,8 @@ class SkillsAnalyzer:
             text (str): Resume text to analyze
 
         Returns:
-            Tuple[List[SkillGroup], List[SkillGroup]]: Technical skill groups and soft skill groups found
+            Tuple[List[SkillGroup], List[SkillGroup]]: Technical skill groups and
+                soft skill groups found
         """
         try:
             text_lower = text.lower()
@@ -56,7 +57,8 @@ class SkillsAnalyzer:
             total_soft = sum(len(group.skills) for group in soft_groups)
 
             logger.info(
-                f"Found {total_technical} technical skills in {len(technical_groups)} groups"
+                f"Found {total_technical} technical skills in \
+                    {len(technical_groups)} groups"
             )
             logger.info(f"Found {total_soft} soft skills in {len(soft_groups)} groups")
 
@@ -92,7 +94,8 @@ class SkillsAnalyzer:
             ]
 
             logger.info(
-                f"Found {len(found_technical)} technical skills and {len(found_soft)} soft skills"
+                f"Found {len(found_technical)} technical skills and {len(found_soft)} \
+                    soft skills"
             )
 
             return found_technical, found_soft
@@ -112,7 +115,8 @@ class SkillsAnalyzer:
             job_description (str): Job description text
 
         Returns:
-            Tuple[List[str], List[str], float]: Matched skills, missing skills, match percentage
+            Tuple[List[str], List[str], float]: Matched skills, missing skills,
+            match percentage
         """
         try:
             if not job_description:
@@ -135,7 +139,8 @@ class SkillsAnalyzer:
                 match_percentage = 0.0
 
             logger.info(
-                f"Skill matching: {len(matched_skills)} matched, {len(missing_skills)} missing"
+                f"Skill matching: {len(matched_skills)} matched, \
+                    {len(missing_skills)} missing"
             )
 
             return matched_skills, missing_skills, match_percentage

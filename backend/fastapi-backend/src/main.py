@@ -1,6 +1,14 @@
+import logging
+import os
+
+import uvicorn
 from dotenv import load_dotenv
+from fastapi import HTTPException, Request, responses
 
 from core.logging import setup_logging
+from core.server import create_server
+from features.resume.router import router as resumes_router
+from features.users.router import router as users_router
 
 setup_logging(
     log_level="INFO",
@@ -10,15 +18,6 @@ setup_logging(
 )
 load_dotenv()
 
-import logging
-import os
-
-import uvicorn
-from fastapi import HTTPException, Request, responses
-
-from core.server import create_server
-from features.resume.router import router as resumes_router
-from features.users.router import router as users_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
